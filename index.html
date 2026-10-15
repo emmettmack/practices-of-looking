@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Practices of Looking — Midterm Course</title>
+<style>
+:root{
+  --canvas:#f5f5f7; --surface:#ffffff; --ink:#1d1d1f; --ink-2:#6e6e73; --link:#0066cc; --eyebrow:#b64400;
+  --panel:#ececf0; --line:rgba(0,0,0,.1); --good:#1a7f37; --bad:#c62828;
+  --radius-card:18px; --shadow-card:2px 4px 12px rgba(0,0,0,.08);
+  --font-display:system-ui,-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --font-text:system-ui,-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--canvas:#000;--surface:#1d1d1f;--ink:#f5f5f7;--link:#2997ff;--eyebrow:#ff9a52;--panel:#2b2b2e;--line:rgba(255,255,255,.14);--good:#4cd964;--bad:#ff6b6b;--shadow-card:none}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--canvas);color:var(--ink);font:400 17px/1.47 var(--font-text);letter-spacing:-.374px;-webkit-font-smoothing:antialiased}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+button{font:inherit;letter-spacing:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1400px;margin:0 auto;padding:0 22px}
+
+/* nav */
+nav.global{position:sticky;top:0;z-index:50;height:44px;background:color-mix(in srgb,var(--canvas) 80%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
+nav.global .wrap{height:44px;display:flex;align-items:center;justify-content:space-between}
+nav .brand{font-size:12px;font-weight:600;min-width:140px;color:var(--ink)}
+nav .links{display:flex;gap:28px;font-size:12px}
+nav .links a{color:var(--ink);opacity:.8}
+nav .links a:hover{opacity:1;text-decoration:none}
+nav .right{display:flex;gap:12px;align-items:center;min-width:140px;justify-content:flex-end;font-size:12px}
+.pill-stat{background:var(--surface);border-radius:980px;padding:2px 10px;font-variant-numeric:tabular-nums}
+.menu-btn{display:none;background:none;border:0;font-size:12px;padding:0}
+.promo{font-size:12px;text-align:center;padding:12px 22px;color:var(--ink-2);border-bottom:1px solid var(--line);letter-spacing:0}
+.promo b{color:var(--ink);font-weight:600}
+
+/* type */
+h1{font-family:var(--font-display);font-size:80px;line-height:1.05;font-weight:600;letter-spacing:-1.2px;margin:0}
+h1.lesson-title{font-size:64px}
+h2{font-size:28px;line-height:1.14;font-weight:600;letter-spacing:-.3px;margin:0 0 6px}
+h2 span{color:var(--ink-2)}
+.sub{color:var(--ink-2);font-size:17px;max-width:720px;margin:0 0 28px}
+.eyebrow{color:var(--eyebrow);font-size:12px;font-weight:600;letter-spacing:.2px;text-transform:uppercase;margin-bottom:8px}
+.link{font-size:14px;letter-spacing:normal}
+.link::after{content:" ›"}
+section.blk{padding:72px 0 0}
+
+/* hero */
+.hero{display:flex;justify-content:space-between;gap:48px;padding:72px 0 40px;align-items:flex-start}
+.hero .intro{max-width:640px;text-align:right}
+.hero .intro p{font-size:28px;line-height:1.2;font-weight:600;letter-spacing:-.3px;margin:0 0 16px;color:var(--ink-2)}
+.hero .intro p b{color:var(--ink)}
+.hero .intro .links{display:flex;gap:24px;justify-content:flex-end;font-size:14px;flex-wrap:wrap}
+
+/* buttons */
+.btn{background:var(--link);color:#fff;border:0;border-radius:980px;padding:11px 21px;font-size:17px;display:inline-block}
+.btn:hover{filter:brightness(1.08);text-decoration:none}
+.btn.sec{background:transparent;border:1px solid var(--link);color:var(--link)}
+.btn.sm{font-size:14px;padding:6px 14px}
+.btn[disabled]{opacity:.4;cursor:default}
+.tlink{background:none;border:0;padding:0;color:var(--link);font-size:14px;letter-spacing:normal}
+.tlink:hover{text-decoration:underline}
+.tlink::after{content:" ›"}
+
+/* course map */
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.lcard{background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-card);overflow:hidden;display:flex;flex-direction:column;color:var(--ink)}
+.lcard:hover{text-decoration:none}
+.lcard .top{padding:28px 28px 16px}
+.lcard h3{font-size:28px;line-height:1.1;font-weight:700;letter-spacing:-.3px;margin:0 0 10px}
+.lcard p{margin:0 0 14px;color:var(--ink-2);font-size:16px;line-height:1.4;letter-spacing:-.2px}
+.lcard .foot{margin-top:auto;background:var(--panel);padding:16px 28px;font-size:14px;display:flex;justify-content:space-between;align-items:center;letter-spacing:normal}
+.lcard.done .foot{color:var(--good);font-weight:600}
+.lcard.next{outline:2px solid var(--link);outline-offset:-2px}
+
+/* lesson */
+.lhead{padding:56px 0 8px}
+.lgoal{font-size:28px;line-height:1.2;font-weight:600;letter-spacing:-.3px;color:var(--ink-2);max-width:880px;margin:14px 0 0}
+.lgoal b{color:var(--ink)}
+.stepper{display:flex;gap:8px;flex-wrap:wrap;margin:32px 0 28px}
+.stepper button{background:var(--surface);border:0;border-radius:980px;padding:8px 18px;font-size:14px;letter-spacing:normal}
+.stepper button[aria-selected=true]{background:var(--ink);color:var(--canvas)}
+.stepper button .tick{color:var(--good);margin-left:4px}
+.prose{max-width:760px}
+.prose h3{font-size:28px;line-height:1.14;font-weight:600;letter-spacing:-.3px;margin:44px 0 10px}
+.prose h3:first-child{margin-top:0}
+.prose p{font-size:19px;line-height:1.5;margin:0 0 16px;letter-spacing:-.3px}
+.prose p em{font-style:normal;font-weight:600}
+.prose .box{background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:22px 26px;margin:20px 0;font-size:17px;line-height:1.45}
+.prose .box .eyebrow{margin-bottom:6px}
+.prose .box p{font-size:17px;margin:0}
+.nav-row{display:flex;justify-content:space-between;gap:12px;margin:48px 0 0;flex-wrap:wrap}
+
+/* term cards */
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:0 0 24px}
+.toolbar input[type=search]{flex:1 1 220px;max-width:360px;padding:10px 16px;border-radius:980px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:15px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.card{background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-card);overflow:hidden;display:flex;flex-direction:column}
+.card .top{padding:28px 28px 16px}
+.card h3{font-size:28px;line-height:1.1;font-weight:700;letter-spacing:-.3px;margin:0 0 10px}
+.card .def{color:var(--ink-2);font-size:16px;line-height:1.4;margin:0 0 14px;letter-spacing:-.2px}
+.card .why,.card .quote{display:none;font-size:15px;line-height:1.4;margin:0 0 14px}
+.card .why{padding-left:12px;border-left:3px solid var(--eyebrow)}
+.card .quote{font-style:italic}
+.card .quote small{display:block;font-style:normal;color:var(--ink-2);font-size:12px;margin-top:4px}
+.card.show-why .why,.card.show-quote .quote{display:block}
+.card .acts{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.card .ex{margin-top:auto;background:var(--panel);padding:20px 28px 24px;font-size:15px;line-height:1.4}
+.card .ex b{display:block;font-size:12px;color:var(--ink-2);text-transform:uppercase;font-weight:600;margin-bottom:4px;letter-spacing:.2px}
+.card .masker{transition:filter .25s;display:flex;flex-direction:column;flex:1}
+body.recall .card:not(.revealed) .masker{filter:blur(7px);user-select:none}
+.card.known{outline:2px solid var(--good);outline-offset:-2px}
+.card.hidden{display:none}
+
+/* quiz */
+.q{background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:26px 28px;margin-bottom:16px;max-width:820px}
+.q .qt{font-size:21px;line-height:1.3;font-weight:600;letter-spacing:-.3px;margin:0 0 14px}
+.opts{display:grid;gap:10px}
+.opt{background:var(--canvas);border:1px solid var(--line);border-radius:12px;padding:12px 16px;text-align:left;font-size:16px;line-height:1.35}
+.opt:hover{border-color:var(--link)}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+.expl{display:none;margin-top:14px;font-size:15px;line-height:1.45;color:var(--ink-2)}
+.expl b{color:var(--ink)}
+.q.answered .expl{display:block}
+.scorebar{font-size:17px;margin:20px 0;max-width:820px}
+.scorebar b{color:var(--eyebrow)}
+.score{font-size:14px;color:var(--ink-2);letter-spacing:normal}
+
+/* compare */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.tabs button{background:var(--surface);border:0;border-radius:980px;padding:8px 18px;font-size:14px;letter-spacing:normal}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--canvas)}
+.tablecard{background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:8px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:15px;line-height:1.4;letter-spacing:-.2px}
+th,td{text-align:left;padding:14px 18px;vertical-align:top;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;text-transform:uppercase;color:var(--eyebrow);font-weight:600;letter-spacing:.2px}
+td:first-child{font-weight:600;color:var(--ink);white-space:nowrap}
+td{color:var(--ink-2)}
+.say{margin:18px 0 0;padding:20px 24px;background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-card);font-size:17px}
+.say b{color:var(--eyebrow);font-size:12px;text-transform:uppercase;display:block;margin-bottom:4px;letter-spacing:.2px}
+.flips{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.flip{background:var(--surface);border:0;border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:24px 26px;text-align:left;min-height:140px}
+.flip h3{margin:0;font-size:21px;line-height:1.2;letter-spacing:-.2px}
+.flip p{display:none;margin:8px 0 0;color:var(--ink-2);font-size:15px;line-height:1.4}
+.flip.open p{display:block}
+.flip.open h3{font-size:17px}
+.flip .hint{font-size:12px;color:var(--link);margin-top:10px;letter-spacing:normal}
+.flip.open .hint{display:none}
+
+/* drill / essays */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:28px}
+.panel h3{margin:0 0 4px;font-size:28px;line-height:1.1;letter-spacing:-.3px}
+.panel textarea{width:100%;min-height:64px;border:1px solid var(--line);border-radius:12px;background:var(--canvas);color:var(--ink);font:inherit;font-size:15px;padding:10px 14px;margin:4px 0 12px;resize:vertical}
+.panel label{font-size:12px;font-weight:600;text-transform:uppercase;color:var(--ink-2);letter-spacing:.2px}
+.model{display:none;background:var(--panel);border-radius:12px;padding:16px 18px;font-size:15px;line-height:1.45;margin-top:12px}
+.model.on{display:block}
+.model b{color:var(--eyebrow)}
+.qtext{font-size:22px;line-height:1.3;font-weight:600;letter-spacing:-.3px;margin:8px 0 0}
+.essays{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px}
+.essay{background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:28px}
+.essay q{font-size:22px;line-height:1.25;font-weight:600;letter-spacing:-.3px;display:block;margin:0 0 6px;quotes:"“" "”"}
+.essay .src{font-size:14px;color:var(--ink-2);margin:0 0 14px;letter-spacing:normal}
+.essay ol{display:none;margin:12px 0 0;padding-left:20px;font-size:15px;line-height:1.45;color:var(--ink-2)}
+.essay ol b{color:var(--ink)}
+.essay.open ol{display:block}
+.template{margin-top:20px;background:var(--surface);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:28px}
+.template ol{margin:8px 0 0;padding-left:22px;line-height:1.5}
+.template li{margin-bottom:6px}
+.timer{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.timer .clock{font-size:40px;font-weight:600;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+
+footer{margin-top:120px;padding:24px 0 48px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-2);letter-spacing:normal}
+
+@media (max-width:1000px){.two{grid-template-columns:1fr}}
+@media (max-width:734px){
+  h1,h1.lesson-title{font-size:40px;letter-spacing:-.6px}
+  .hero{flex-direction:column;padding:40px 0 28px;gap:20px}
+  .hero .intro{text-align:left}
+  .hero .intro .links{justify-content:flex-start}
+  .hero .intro p,.lgoal{font-size:22px}
+  nav .links{display:none}
+  nav .links.open{display:flex;position:absolute;top:44px;left:0;right:0;flex-direction:column;gap:0;background:var(--canvas);border-bottom:1px solid var(--line);padding:8px 22px}
+  nav .links.open a{padding:12px 0;font-size:17px}
+  .menu-btn{display:block;color:var(--link)}
+  .cgrid{grid-template-columns:1fr}
+  .prose p{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<nav class="global">
+  <div class="wrap">
+    <a class="brand" href="#/">Midterm Course</a>
+    <div class="links" id="navlinks">
+      <a href="#/">Course map</a><a href="#/exam">Exam lab</a><a href="#/glossary">Glossary</a>
+    </div>
+    <div class="right"><button class="menu-btn" id="menubtn">Menu</button><span class="pill-stat" id="navprog"></span></div>
+  </div>
+</nav>
+<div class="promo">Exam: <b>Thursday, Oct 15</b> · 4 IDs (10 pts) + 2 essays (30 pts) · 75 minutes</div>
+
+<main class="wrap" id="app"></main>
+
+<footer>
+  <div class="wrap">Quotations are study versions keyed to the readings; add page numbers from your Brightspace edition before using them in written work. Progress is saved in this browser.</div>
+</footer>
+
+<script>
+/* ============ DATA ============ */
+const T = [
+ // lesson 1
+ {id:"culture",L:1,n:"Culture",a:"Williams",d:"A whole way of life: the shared meanings, values, practices, institutions and creative works through which a group understands and organizes experience.",q:"Culture is ordinary: that is the first fact.",qa:"Williams",w:"Joins everyday life to systems of meaning. Stops us treating art or media as separate from ordinary institutions, habits and power.",e:"A college football game: stadium and uniforms (material), school identity and rituals (symbolic), shared rules."},
+ {id:"matsym",L:1,n:"Material / symbolic culture",a:"Williams",d:"Material culture is physical objects, technologies and spaces. Symbolic culture is the meanings, values, language and images attached to them. Both are parts of one way of life.",q:"The most ordinary common meanings and the finest individual meanings.",qa:"Williams",w:"Lets you ask both what a cultural object physically is and what it has been made to mean. The two constantly shape each other.",e:"A U.S. flag is dyed cloth materially, but symbolically it can mean nation, sacrifice, freedom, protest or exclusion."},
+ {id:"trans",L:1,n:"Transmission model",a:"Carey",d:"Communication as sending information across distance for control: a sender packages a message and delivers it to a receiver.",q:"Imparting, sending, transmitting, or giving information to others.",qa:"Carey",w:"Explains communication as movement and influence, but makes audiences seem passive and ignores the shared cultural world that makes messages meaningful.",e:"An emergency text alert sends a warning from an institution to many recipients."},
+ {id:"ritual",L:1,n:"Ritual model",a:"Carey",d:"Communication as participation in a shared world. It maintains society by repeatedly representing common beliefs, not just delivering new facts.",q:"Sharing, participation, association, fellowship, and the possession of a common faith.",qa:"Carey",w:"Connects communication to culture, ceremony and community. Asks what social order a repeated media practice sustains.",e:"Watching the Super Bowl together: the gathering and national spectacle matter beyond the game's information."},
+ {id:"socon",L:1,n:"Social construction",a:"Carey / Wilson",d:"The process through which communication, representation, institutions and repeated practices produce what a society treats as real, normal or valuable.",q:"Reality is not given, not humanly existent, independent of language.",qa:"Carey",w:"Shifts analysis from whether media mirror reality to how representations help make categories, identities and social worlds.",e:"Instagram beauty trends: filters, rankings and influencer images help construct standards of attractiveness."},
+ {id:"defam",L:1,n:"Making strange (ostranie)",a:"Carey",d:"A technique that presents familiar things in an unfamiliar way so habitual assumptions become noticeable and open to analysis. Also called defamiliarization.",q:"Produce, maintain, repair, and transform reality.",qa:"Carey",w:"Interrupts common sense. A method for exposing codes and ideologies that normally vanish because they feel natural.",e:"Get Out makes the language of liberal tolerance feel unsettling, exposing racial possession beneath polite behavior."},
+ // lesson 2
+ {id:"ideology",L:2,n:"Ideology",a:"Marx/Engels, Gramsci, Althusser",d:"A socially organized framework of beliefs and values through which people understand reality and their place in it. It makes historically produced arrangements look natural or inevitable.",q:"The ideas of the ruling class are in every epoch the ruling ideas.",qa:"Marx and Engels",w:"Links representation to power. Media do more than reflect the world: they normalize particular interests, identities and relations.",e:"Ads equating home buying with personal success make property and consumption seem like natural measures of adulthood."},
+ {id:"base",L:2,n:"Base / superstructure",a:"Marx",d:"Marxist model in which the economic base (forces and relations of production) conditions the political, legal, educational, religious and cultural superstructure.",q:"The mode of production of material life conditions the general process of social, political and intellectual life.",qa:"Marx",w:"Links culture to material organization and class power. Later theorists complicate strict determination with feedback, contradiction and struggle.",e:"Streaming ownership, subscription models and algorithms decide which films get funded, promoted and seen."},
+ {id:"falsec",L:2,n:"False consciousness",a:"Marx/Engels",d:"A disputed concept for a distorted understanding of social relations that stops people recognizing exploitation or shared class interests.",q:"The real motive forces impelling him remain unknown to him.",qa:"Engels",w:"Explains how dominant ideology hides inequality, but can sound paternalistic if critics assume only they hold the truth. Gramsci complicates it.",e:"A worker blames personal laziness for unstable wages while ignoring scheduling practices, labor law and employer power."},
+ {id:"opp",L:2,n:"Oppressor / oppressed",a:"Marx, Said, Anzaldúa",d:"A relational model where dominant groups keep power by exploiting, controlling, representing or defining subordinated groups. Marx stresses class, Said colonial discourse, Anzaldúa border, racial, linguistic, gender and sexual hierarchies.",q:"The history of all hitherto existing society is the history of class struggles.",qa:"Marx and Engels",w:"Directs attention from individual prejudice to structured relationships. Said and Anzaldúa complicate the binary with hybridity and representation.",e:"Colonial films portraying colonized people as childlike justify rule by casting the West as rational guardian."},
+ // lesson 3
+ {id:"hegem",L:3,n:"Hegemony",a:"Gramsci, Wilson, Said",d:"Rule secured mainly through cultural leadership and consent. Dominant groups make their worldview appear to be society's shared common sense while continually responding to resistance.",q:"The spontaneous consent given by the great masses of the population.",qa:"Gramsci",w:"Ideology is the framework; hegemony is the ongoing process of winning consent for it. Explains why ideology is active, unstable and contested.",e:"News and entertainment repeatedly treating homeownership as the normal adult goal makes property-centered capitalism feel universal."},
+ {id:"sense",L:3,n:"Good sense / common sense",a:"Gramsci",d:"Common sense is the contradictory pile of assumptions inherited from everyday culture. Good sense is its more coherent, critical element that can be developed toward change.",q:"Fragmentary, incoherent and inconsequential.",qa:"Gramsci",w:"Avoids treating ordinary people as simply deceived. Existing beliefs hold both dominant assumptions and resources for critique.",e:"Hard work matters can support neoliberal self-blame, or become good sense when workers ask why hard work doesn't bring fair pay."},
+ {id:"organic",L:3,n:"Organic intellectual",a:"Gramsci",d:"A thinker or organizer who emerges from a social group and helps it articulate experience, build knowledge and form a political worldview.",q:"All men are intellectuals, but not all men have in society the function of intellectuals.",qa:"Gramsci",w:"Broadens intellectual work beyond universities and ties knowledge production to hegemony, organizing and lived experience.",e:"A warehouse worker who documents unsafe conditions and teaches coworkers how to organize."},
+ {id:"counter",L:3,n:"Counter-hegemony",a:"Gramsci",d:"Ideas, practices, institutions and alliances that challenge dominant common sense and build an alternative account of social life.",q:"Every relationship of hegemony is necessarily an educational relationship.",qa:"Gramsci",w:"More than disagreement: it builds durable meanings and collective capacities that could reorganize power.",e:"Labor organizers using worker stories, independent media and mutual aid to redefine low wages as collective injustice."},
+ // lesson 4
+ {id:"interp",L:4,n:"Interpellation",a:"Althusser",d:"The process by which ideology hails individuals and recruits them into recognizable social identities or subject positions.",q:"Hey, you there!",qa:"Althusser",w:"Shows ideology works through recognition and participation, not only force. A message works when you think it addresses someone like you.",e:"A recruitment ad asking What's your warrior? invites viewers to see themselves as potential service members."},
+ {id:"neolib",L:4,n:"Neoliberalism",a:"Wilson",d:"A political and cultural logic that extends market competition, privatization, entrepreneurialism and individual responsibility into more areas of life while weakening collective provision.",q:"Competition as a way of life.",qa:"Wilson",w:"Connects economics to subject formation: people treat education, relationships, bodies and online identities as investments in competitive value.",e:"Students told to build a personal brand and treat every activity as résumé capital."},
+ {id:"selfenc",L:4,n:"Self-enclosed individualism",a:"Wilson",d:"The neoliberal ideal of a bounded, self-managing person imagined as personally responsible for outcomes and only loosely obligated to others.",q:"Living in competition.",qa:"Wilson",w:"Shows how structural problems are individualized. Contrasts with culture as shared meaning and ritual communication's common life.",e:"A wellness app framing burnout only as a failure of personal habits, hiding workload, wages and housing costs."},
+ // lesson 5
+ {id:"poly",L:5,n:"Polysemy",a:"Hall",d:"The capacity of a sign or text to support multiple meanings. Meanings are constrained by codes and context but never guaranteed identical for every viewer.",q:"There is no necessary correspondence between encoding and decoding.",qa:"Hall",w:"Makes dominant, negotiated and oppositional readings possible. Keeps audience agency without claiming every reading is equally plausible.",e:"Barbie can be decoded as feminist critique, corporate marketing, nostalgic entertainment, or all three."},
+ {id:"denot",L:5,n:"Denotative meaning",a:"Hall",d:"The apparently literal, face-value meaning of a sign. Hall stresses even seemingly literal meanings are organized by codes.",q:"The literal meaning.",qa:"Hall",w:"Comparing denotation with connotation shows how ideology can hide as simple description or common sense.",e:"A rose denotes a flower."},
+ {id:"connot",L:5,n:"Connotative meaning",a:"Hall",d:"The social, cultural, emotional and ideological associations added to a sign's literal meaning.",q:"More active ideological dimensions.",qa:"Hall",w:"Where representation meets history and power most visibly. Explains why the same object evokes different values for different communities.",e:"A white lab coat denotes clothing but connotes expertise, science, cleanliness and institutional authority."},
+ {id:"enc",L:5,n:"Encoding",a:"Hall",d:"How producers organize events and ideas into a meaningful media text using professional routines, technologies, cultural codes and assumptions about audiences.",q:"The event must become a story before it can become a communicative event.",qa:"Hall",w:"Media never transmit raw reality. Selection, framing, genre, language and institutional interests shape the preferred meaning.",e:"A news outlet encodes a protest as civic participation or public disorder through camera angles, interviews, captions and vocabulary."},
+ {id:"dec",L:5,n:"Decoding",a:"Hall",d:"How audiences interpret an encoded text using their own cultural knowledge, identities, circumstances and relationship to dominant codes.",q:"Determinate moments, relatively autonomous.",qa:"Hall",w:"Audiences are active but not free: readings vary, yet within unequal systems of language and power.",e:"Viewers decode a police body-camera clip as accountability, danger, institutional self-protection or incomplete evidence."},
+ {id:"dom",L:5,n:"Dominant reading",a:"Hall",d:"A decoding position that accepts the preferred meaning and the larger ideological code through which the message was encoded.",q:"Decodes the message in terms of the reference-code in which it has been encoded.",qa:"Hall",w:"Shows how hegemony is reproduced when a text's preferred assumptions are received as natural and legitimate.",e:"A viewer accepts a luxury-car ad's claim that an expensive vehicle represents deserved success."},
+ {id:"neg",L:5,n:"Negotiated reading",a:"Hall",d:"A position that accepts the dominant framework in general but modifies it through local experience, exceptions or practical needs.",q:"A mixture of adaptive and oppositional elements.",qa:"Hall",w:"Often the most realistic account of reception: people consent to an ideology while resisting parts that conflict with their lives.",e:"A viewer likes a fitness campaign's health message but rejects its narrow body ideal and expensive products."},
+ {id:"oppr",L:5,n:"Oppositional reading",a:"Hall",d:"A position that understands the preferred meaning but rejects its ideological framework and reconstructs the message through an alternative code.",q:"Detotalizes the message in the preferred code in order to retotalize it within some alternative framework.",qa:"Hall",w:"Shows audiences can resist hegemony, while also showing resistance needs access to alternative languages, experiences or communities.",e:"An anti-recruitment viewer reads a heroic military trailer as propaganda hiding war's costs."},
+ // lesson 6
+ {id:"imag",L:6,n:"Imagined community",a:"Anderson",d:"The nation as a socially imagined political community: members never know most fellow members, yet imagine a shared bond and bounded collective.",q:"An imagined political community, imagined as both inherently limited and sovereign.",qa:"Anderson",w:"Explains how media, language, maps, rituals and shared stories make large-scale belonging feel intimate and natural.",e:"Daily newspapers let dispersed readers imagine moving through the same national time and events."},
+ {id:"orient",L:6,n:"Orientalism",a:"Said",d:"The Western discourse that produces the Orient as exotic, backward, irrational, sensual or dangerous in contrast to a rational, modern West.",q:"The Orient was almost a European invention.",qa:"Said",w:"Links representation to colonial knowledge and power. Stereotypes help authorize domination and intervention.",e:"Aladdin's composite Arabian setting packages diverse cultures as timeless, magical and dangerous for Western consumption."},
+ {id:"other",L:6,n:"The Other",a:"Said, Anzaldúa",d:"A person or group defined as fundamentally different from and inferior to a dominant self. Othering stabilizes the dominant group's identity through hierarchical contrast.",q:"The Orient has helped to define Europe (or the West) as its contrasting image.",qa:"Said",w:"Connects binaries, ideology, oppression and representation. Anzaldúa shows border-dwellers inhabit categories the binary cannot hold.",e:"News images depicting migrants only as an anonymous flood make them a threatening mass and affirm the citizen as normal."},
+ // lesson 7
+ {id:"pop",L:7,n:"Popular culture",a:"Williams",d:"Widely circulated cultural practices and texts: entertainment, style, sport, everyday media. Can mean culture liked by many, made for many, or made by people themselves.",q:"Culture is ordinary.",qa:"Williams",w:"A major site where commercial power, pleasure, identity, hegemony and resistance meet. Should not be dismissed as politically empty.",e:"TikTok dance trends are commercialized by platforms but remade by users across communities."},
+ {id:"high",L:7,n:"High culture / highbrow",a:"S/C glossary",d:"Forms institutionally classified as refined, serious or artistically superior, linked to elite education and spaces like museums, opera houses and universities.",q:"A culture which is limited to arts and learning.",qa:"Williams (rejecting it)",w:"Reveals that cultural value is socially organized. Connects to taste and cultural capital because access to legitimate culture is uneven.",e:"Opera is labeled high culture, and familiarity with its conventions can signal education and status."},
+ {id:"low",L:7,n:"Low culture / lowbrow",a:"S/C glossary",d:"Forms judged vulgar, simple, commercial or ordinary by dominant institutions, often because of their audiences as much as their form.",q:"The bad new commercial culture.",qa:"Williams (criticizing the idea)",w:"The label can turn class prejudice into aesthetic judgment. Asks who gets to classify some pleasures as inferior.",e:"Reality TV is dismissed as lowbrow even when viewers use it to debate gender, work, class and authenticity."},
+ {id:"masses",L:7,n:"Masses / mass culture",a:"Williams",d:"Masses is an abstract label for large populations imagined as undifferentiated and passive. Mass culture is standardized cultural goods produced and distributed at industrial scale.",q:"There are in fact no masses; there are only ways of seeing people as masses.",qa:"Williams",w:"Exposes a tension between criticizing concentrated media industries and stereotyping audiences as manipulable or tasteless.",e:"A global superhero franchise is mass-produced and marketed, yet audiences interpret and repurpose it differently."},
+ {id:"ccap",L:7,n:"Cultural capital",a:"Bourdieu",d:"Valued knowledge, tastes, speech styles, credentials and dispositions that provide social advantages. May be embodied, objectified or institutionalized.",q:"Taste classifies, and it classifies the classifier.",qa:"Bourdieu",w:"Explains how class inequality is reproduced through seemingly neutral judgments of merit, education, refinement and fit.",e:"Knowing how to discuss contemporary art can make a student seem sophisticated in an internship interview, but it depends on prior access."},
+ {id:"taste",L:7,n:"Taste",a:"Bourdieu, Bishop",d:"Socially learned judgments about what is beautiful, good, refined, entertaining or vulgar. Feels personal but reflects class position and cultural training.",q:"Taste classifies, and it classifies the classifier.",qa:"Bourdieu",w:"Converts social difference into cultural hierarchy. Connects high and low culture to cultural capital and makes privilege look natural.",e:"Preferring independent films to reality TV can function as a claim to education and distinction, not just enjoyment."},
+ // lesson 8
+ {id:"auth",L:8,n:"Authenticity",a:"Benjamin",d:"The attributed quality of being genuine, original and tied to a specific history, not a copy. Technical reproduction transforms this status.",q:"The whole sphere of authenticity is outside technical reproducibility.",qa:"Benjamin",w:"Authenticity isn't just in the object: institutions and audiences authorize it. Links originality to ownership, history, ritual and market value.",e:"A museum-verified painting is authentic while an identical poster is not."},
+ {id:"aura",L:8,n:"Aura",a:"Benjamin",d:"The unique presence and authority of an artwork grounded in its singular existence, distance, history and tradition.",q:"The unique phenomenon of a distance, however close it may be.",qa:"Benjamin",w:"Explains what changes when images become endlessly reproducible: access expands, but uniqueness, ritual authority and presence may weaken.",e:"Seeing the Mona Lisa in the Louvre carries an aura that viewing the same image on a phone does not."},
+ {id:"cult",L:8,n:"Cult value / exhibition value",a:"Benjamin",d:"Cult value comes from an image's ritual use, secrecy and embeddedness in tradition. Exhibition value comes from visibility, circulation and availability to audiences.",q:"The cult value of the work of art gives way to its exhibition value.",qa:"Benjamin",w:"Explains how photography and film shift art's function from ritual authority toward mass display and politics.",e:"A sacred icon in a shrine has cult value; its photographed version on posters and social media emphasizes exhibition value."},
+ {id:"cind",L:8,n:"Culture industries",a:"Adorno / Horkheimer",d:"Capitalist institutions that industrialize culture through standardization, repetition, marketing and managed forms of difference.",q:"Culture today is infecting everything with sameness.",qa:"Adorno and Horkheimer",w:"Ties entertainment to capitalism and ideological conformity. Sets up a debate with Hall, who gives audiences more interpretive agency.",e:"Streaming services recommend formulaic variations of successful genres, making personalization feel unique while keeping users in standard options."}
+];
+
+const COMPARE = [
+ {t:"Power chain",cols:["","Marx / Engels","Gramsci","Althusser","Wilson"],rows:[
+  ["How ideology works","Ruling-class ideas dominate and distort","Consent through common sense","Hails people into identities","Competition becomes a way of life"],
+  ["Are people duped?","Yes (false consciousness)","No: common sense holds good sense","They recognize themselves and collude","They internalize self-blame"],
+  ["Can people resist?","Class revolution","Yes: counter-hegemony, organic intellectuals","Little room, subject is already formed","Only if collective frames return"],
+  ["Main driver","The economy","Culture and institutions","Institutions (ISAs)","Market logic"]],
+  s:"Marx puts the economy first and people as potentially deluded; Gramsci puts culture and consent first and people as active and contradictory; Althusser shows how ideology forms who we are; Wilson is the present-day hegemony."},
+ {t:"Transmission vs ritual",cols:["","Transmission","Ritual"],rows:[
+  ["Communication is","Sending information across distance, for control","Participation in a shared world"],
+  ["Audience","Passive receiver","Community member"],
+  ["Key words","Imparting, sending","Sharing, fellowship, common faith"],
+  ["Example","Emergency text alert","Watching the Super Bowl together"]],
+  s:"Carey's ritual model is Williams's ordinary culture in action: communication is how a shared way of life is built and maintained."},
+ {t:"Hall's three readings",cols:["","Dominant","Negotiated","Oppositional"],rows:[
+  ["Relation to preferred meaning","Accepts it and its ideology","Accepts the frame, modifies locally","Understands it, rejects the frame"],
+  ["Effect on hegemony","Reproduces it","Partly reproduces, partly bends it","Challenges it"],
+  ["Recruitment ad","Serving is honorable","Honorable, but not for me","It's propaganda hiding war's costs"]],
+  s:"Polysemy makes several readings possible; Hall's three positions describe how each relates to the preferred code."},
+ {t:"Art, tech and audiences",cols:["","Benjamin","Adorno / Horkheimer","Williams / Hall"],rows:[
+  ["View of mass reproduction","Loses aura but gains access and political use","Standardizes and controls","Culture is ordinary; reproduction is just part of it"],
+  ["View of audience","Capable of critical, distracted viewing","Manipulated, conforming","Active (Hall) and 'there are no masses' (Williams)"],
+  ["Mood","Cautiously hopeful","Pessimistic","Respectful of popular culture"]],
+  s:"Benjamin and Adorno are both Frankfurt School and agree technology changes art, but Benjamin sees emancipatory potential while Adorno sees conformity. Williams and Hall reject the passive-masses picture."},
+ {t:"Nation, Other, borders",cols:["","Anderson","Said","Anzaldúa"],rows:[
+  ["Main idea","The nation is an imagined community","Orientalism produces the East as Other","The borderland holds identities the binary can't"],
+  ["Builds","The 'we'","The 'they'","Hybrid, in-between selves"],
+  ["Where it's seen from","Inside the nation","Outside, in colonial knowledge","Inside the border itself"],
+  ["Link to oppression","Belonging can exclude","Stereotype authorizes domination","Intersecting race, language, gender, sexuality"]],
+  s:"Imagined community plus Othering is how belonging and exclusion work together. Anzaldúa complicates the clean oppressor/oppressed binary."},
+ {t:"Williams vs Bourdieu",cols:["","Williams","Bourdieu"],rows:[
+  ["Claim about hierarchy","The high/low divide is a false picture; culture is ordinary","The divide is real and socially produced"],
+  ["Question asked","What counts as culture?","Who benefits from what counts as good taste?"],
+  ["Key concept","Ordinary culture, no masses","Cultural capital, taste"],
+  ["Link to hegemony","Challenges elite definitions of culture","Shows how elite preferences pass as universal 'good taste'"]],
+  s:"Williams says the hierarchy is false; Bourdieu explains how it functions and why it persists."},
+ {t:"Ideology vs hegemony",cols:["","Ideology","Hegemony"],rows:[
+  ["What it names","The framework of beliefs and meanings","The ongoing process of winning consent for it"],
+  ["Static or dynamic?","Can sound fixed","Always in flux, always contested"],
+  ["Who","Marx, Althusser, Gramsci","Gramsci, Wilson, Said"],
+  ["Resistance","Marx: revolution; Althusser: little room","Counter-hegemony and organic intellectuals"]],
+  s:"Ideology names the framework of meaning; hegemony names the process by which a dominant framework wins consent and becomes common sense."}
+];
+
+const FLIPS = [
+ ["Ideology and hegemony","Ideology is the framework of meaning; hegemony is the ongoing process by which a dominant framework wins consent and becomes common sense."],
+ ["Polysemy and decoding","Polysemy makes several readings possible; Hall's dominant, negotiated and oppositional positions describe how each relates to the preferred code."],
+ ["Social construction and making strange","Social construction explains how normality is made; defamiliarization makes that construction visible."],
+ ["Base and culture industries","Base/superstructure links ownership to culture; culture-industry theory explains standardization inside capitalist media."],
+ ["Hegemony and organic intellectuals","Hegemony is fought through education and meaning; organic intellectuals turn a group's experience into counter-hegemonic knowledge."],
+ ["Imagined community and Orientalism","National belonging creates an imagined 'we'; Orientalism builds an external 'they' against which the nation or West defines itself."],
+ ["Aura and exhibition value","Mechanical reproduction weakens an artwork's unique ritual presence while increasing circulation and exhibition value."],
+ ["Taste and cultural capital","Taste seems individual, but cultural capital explains how institutions reward learned preferences and turn them into advantage."]
+];
+
+/* Quiz: first option is the correct one (shuffled at render) */
+const LESSONS = [
+{ n:1, title:"Culture and meaning", min:20, short:"What culture is, how communication builds a shared world, and why reality is constructed.",
+  goal:"By the end you can explain <b>what culture is</b> and why media <b>help make</b> reality instead of mirroring it.",
+  learn:[
+   {h:"Culture is ordinary",p:["Most people hear the word culture and think of museums, opera, or fine art. Raymond Williams says that is too narrow. Culture is a <em>whole way of life</em>: the shared meanings, values, habits, institutions and creative works of a group. His famous line is “Culture is ordinary.”","So a college football game is culture. So is a family dinner or a group chat. Culture is not a thing set apart from daily life, it is how daily life gets organized and understood."]},
+   {h:"Two layers: material and symbolic",p:["Every cultural object has two layers. The <em>material</em> layer is the physical stuff: the stadium, the uniforms, the dyed cloth of a flag. The <em>symbolic</em> layer is the meaning attached to it: school pride, tradition, nation, freedom, protest.","The two shape each other. A flag does not carry meaning by itself, people make and fight over what it means. When the exam asks about culture, mention both layers."]},
+   {h:"Two ways to think about communication",p:["James Carey says there are two models. The <em>transmission model</em> treats communication as sending information from a sender to a receiver, for control. An emergency text alert is a perfect example. It treats audiences as passive.","The <em>ritual model</em> treats communication as participation in a shared world. The point is not new facts, it is gathering, repeating, and confirming what a group believes. Watching the Super Bowl together is ritual: the shared national spectacle matters more than the score."]},
+   {h:"Reality is built, not given",p:["If communication builds shared worlds, then reality is <em>socially constructed</em>. Carey: “Reality is not given.” Media do not just mirror the world, they help produce the categories we think with. Think of how filters and influencers help define what counts as beautiful.","The tool for seeing this is <em>making strange</em> (ostranie, defamiliarization). A good film or artwork makes the familiar feel unfamiliar so you notice the hidden rules. <i>Get Out</i> makes polite liberal tolerance feel sinister, which exposes what was hiding underneath."]}
+  ],
+  remember:"Williams and Carey both widen culture beyond elite art and narrow information. Culture is lived, shared and made. Social construction is the bridge to everything that follows, because if reality is made, someone has power over how.",
+  exam:"If an essay quote is about meaning or reality, start from Carey's ritual model and connect it to Williams's ordinary culture. Use football, the Super Bowl or a flag as your example.",
+  bridge:"Next: if reality is constructed, who controls the construction? That is the question of ideology.",
+  quiz:[
+   {q:"What does Williams mean by “Culture is ordinary”?",o:["Culture is a whole way of life, including everyday meanings and practices","Culture is limited to the arts and learning","Culture is whatever is mass-produced","Culture belongs only to national traditions"],e:"Williams widens culture from elite arts to the shared way of life, from the most ordinary meanings to the finest."},
+   {q:"A U.S. flag is dyed cloth, but also stands for nation, sacrifice or protest. This illustrates…",o:["Material versus symbolic culture","Transmission versus ritual","Base versus superstructure","Encoding versus decoding"],e:"The cloth is material culture; what it means is symbolic culture."},
+   {q:"A phone alert warning of a storm is closest to which of Carey's models?",o:["Transmission","Ritual","Social construction","Making strange"],e:"A sender delivers information to receivers across distance: the transmission model."},
+   {q:"Why does Carey say media are not simply mirrors of reality?",o:["Communication helps produce and maintain what a society treats as real","Media are always lying","Audiences never understand them","Reality only exists in language"],e:"Reality is socially constructed through language and communication, so media help make categories, not just reflect them."},
+   {q:"<i>Get Out</i> makes polite tolerance feel unsettling. That is an example of…",o:["Defamiliarization (making strange)","The transmission model","False consciousness","A dominant reading"],e:"Making strange presents the familiar in an unfamiliar way so hidden assumptions become visible."}
+  ],
+  compare:[1], flips:[2]
+},
+{ n:2, title:"Marx and the power of ideas", min:25, short:"Ideology, base and superstructure, false consciousness, and structured oppression.",
+  goal:"By the end you can explain how <b>economic power</b> shapes <b>culture and ideas</b>, and why that idea is both powerful and criticized.",
+  learn:[
+   {h:"The economy shapes everything else",p:["Karl Marx and Friedrich Engels argue that how a society produces and owns things (its mode of production) shapes the rest of life. Model it in two layers. The <em>base</em> is the economy: who owns factories, platforms and land, and how labor is organized. The <em>superstructure</em> is everything built on top: law, politics, education, religion, culture.","Today’s example is streaming. Ownership, subscription pricing and algorithms decide which films get funded, promoted and seen. The base shapes what culture reaches us."]},
+   {h:"Ideology: ideas that serve power",p:["Marx and Engels: “The ideas of the ruling class are in every epoch the ruling ideas.” <em>Ideology</em> is a framework of beliefs that makes the existing order look natural or inevitable. Ads linking homeownership to adulthood make private property feel like a natural goal.","The key move: ideas are not neutral. The ones that dominate tend to serve those who already hold power."]},
+   {h:"False consciousness, and why it is disputed",p:["<em>False consciousness</em> is the idea that people can hold a distorted picture of their own situation, so they miss exploitation or shared class interests. A worker blames personal laziness for unstable wages and never looks at scheduling practices, labor law or employer power. Engels: the real motive forces “remain unknown to him.”","Critics say the idea is paternalistic: it can sound like the theorist knows the truth and ordinary people are fooled. Gramsci will answer this in the next lesson. In an exam answer, always mention both the idea and the critique."]},
+   {h:"Oppressor and oppressed",p:["Marx and Engels: history is the history of class struggles. The <em>oppressor/oppressed</em> model is about structured relationships, not just individual prejudice. Marx emphasizes class. Later in the course Said emphasizes colonial representation and Anzaldúa emphasizes race, language, gender and sexuality at the border. Those authors complicate any simple binary.","Example: colonial films that portray colonized people as childlike justify rule by casting the West as rational guardian."]}
+  ],
+  remember:"Marx links culture to the economy. Ideology serves power. False consciousness explains how people miss it, but is criticized as condescending.",
+  exam:"When asked about power and culture, start with Marx’s base and superstructure, then complicate with Gramsci or Althusser. Use streaming ownership as a modern example.",
+  bridge:"Next: Gramsci keeps Marx’s concern with power but denies that ordinary people are simply fooled.",
+  quiz:[
+   {q:"In the base/superstructure model, the economic base…",o:["Conditions political, legal and cultural life","Is created by culture","Has no connection to ideas","Only matters in factories"],e:"The mode of production conditions the general process of social, political and intellectual life."},
+   {q:"A worker blames personal laziness for unstable wages and ignores scheduling practices and employer power. This is…",o:["False consciousness","Counter-hegemony","A negotiated reading","Making strange"],e:"A distorted view of social relations that hides structural exploitation."},
+   {q:"Why do critics call false consciousness paternalistic?",o:["It can imply that theorists know the truth while ordinary people are fooled","It denies that economic power exists","It says nobody has ideas","It is only about art"],e:"The idea can treat ordinary people as dupes. Gramsci responds by showing people hold both dominant and critical beliefs."},
+   {q:"“The ideas of the ruling class are in every epoch the ruling ideas” means…",o:["Dominant ideas tend to serve the interests of those with power and appear natural","Rulers invent every idea","Ideas do not matter","Ruling classes are always correct"],e:"Ideology normalizes particular interests so they look like common knowledge."},
+   {q:"Colonial films showing colonized people as childlike, so the West seems like a rational guardian, show…",o:["Oppressor/oppressed relations maintained through representation","Transmission communication","An oppositional reading","Cultural capital"],e:"Dominant groups keep power by defining and representing subordinated groups; Said develops this idea."}
+  ],
+  compare:[], flips:[3]
+},
+{ n:3, title:"Gramsci: consent and resistance", min:25, short:"Hegemony, common sense and good sense, organic intellectuals, counter-hegemony.",
+  goal:"By the end you can explain how power rules through <b>consent</b>, and how people <b>resist</b> it.",
+  learn:[
+   {h:"Hegemony: rule by consent",p:["Antonio Gramsci asks why people accept unequal systems without constant force. His answer is <em>hegemony</em>: dominant groups lead through culture and win “spontaneous consent.” Their worldview becomes the society’s shared common sense. News and entertainment treating homeownership as the normal adult goal helps make property-centered capitalism feel universal.","Quick difference to memorize: <em>ideology</em> names the framework of meaning. <em>Hegemony</em> names the ongoing process of winning consent for it. And that process is never finished, because it must keep responding to resistance."]},
+   {h:"Common sense and good sense",p:["Gramsci calls everyday beliefs <em>common sense</em>: inherited, fragmentary, and contradictory. But inside it is <em>good sense</em>, a more critical core that can be developed toward change.","Example: “Hard work matters” can support neoliberal self-blame. But it becomes good sense when workers ask why hard work does not bring fair pay. This is Gramsci’s answer to false consciousness: ordinary people are not simply duped, their beliefs hold both dominant assumptions and resources for critique."]},
+   {h:"Organic intellectuals",p:["An <em>organic intellectual</em> is a thinker who emerges from a social group and helps it articulate its experience and build knowledge. Gramsci: “All men are intellectuals,” but not everyone has that function in society. A warehouse worker who documents unsafe conditions and teaches coworkers how to organize is one. Intellectual work is not limited to universities."]},
+   {h:"Counter-hegemony",p:["<em>Counter-hegemony</em> is not just disagreement. It means building alternative ideas, institutions and alliances that challenge dominant common sense. Labor organizers using worker stories, independent media and mutual aid to redefine low wages as collective injustice are an example. Gramsci: every hegemonic relationship is an educational relationship, so the fight is about meaning and learning."]}
+  ],
+  remember:"Gramsci’s upgrade of Marx: culture and consent matter, people are active agents, and ideologies are always in flux and in relationship with each other.",
+  exam:"Use Gramsci whenever the question is about resistance. Name the pair: hegemony wins consent, counter-hegemony builds alternatives through organic intellectuals and good sense.",
+  bridge:"Next: Althusser asks how ideology forms who we are, and Wilson shows the ideology of today.",
+  quiz:[
+   {q:"What is the best statement of the difference between ideology and hegemony?",o:["Ideology is a framework of meaning; hegemony is the ongoing process of winning consent for it","They are the same thing","Hegemony is force; ideology is consent","Ideology is only about art"],e:"Hegemony is active, unstable and contested, a process rather than a fixed set of beliefs."},
+   {q:"How does Gramsci differ from Marx on ordinary people?",o:["Their common sense contains both dominant assumptions and critical good sense","He says they are always fooled","He says they have no ideas","He says only intellectuals matter"],e:"People are active agents with contradictory beliefs, which gives room to resist."},
+   {q:"A warehouse worker documents unsafe conditions and teaches coworkers to organize. This worker is…",o:["An organic intellectual","A cultural capital holder","An oppressor","A dominant decoder"],e:"Organic intellectuals emerge from a group and help it articulate experience and build knowledge."},
+   {q:"What makes counter-hegemony more than simple disagreement?",o:["It builds alternative meanings, institutions and alliances","It is louder","It ignores common sense","It avoids politics"],e:"It builds durable meanings and collective capacities that could reorganize power."},
+   {q:"“Hard work matters” becomes good sense when…",o:["Workers ask why hard work does not bring fair pay","It is repeated more often","It is used in ads","People stop working"],e:"Good sense is the critical core inside common sense, developed toward transformation."}
+  ],
+  compare:[6], flips:[0,4]
+},
+{ n:4, title:"Althusser and Wilson: making subjects", min:20, short:"Interpellation, neoliberalism and self-enclosed individualism.",
+  goal:"By the end you can explain how ideology <b>makes us who we are</b>, and how <b>neoliberalism</b> is today’s version.",
+  learn:[
+   {h:"Interpellation: being hailed",p:["Louis Althusser asks how ideology reaches individuals. <em>Interpellation</em> is his answer: ideology “hails” you (“Hey, you there!”) and you turn around, recognizing yourself as the person addressed. In doing that you step into a social identity or subject position.","A military ad asking “What’s your warrior?” invites viewers to recognize themselves as potential service members and patriotic subjects. It works through recognition and participation, not force. This is why Althusser says individuals “collude” with ideology."]},
+   {h:"Compare Althusser with Gramsci",p:["Both see ideology working through institutions and everyday life. Althusser stresses how deeply it forms the subject, which leaves less room for resistance. Gramsci stresses that hegemony is always a struggle that can be lost, so there is more room for resistance and change."]},
+   {h:"Neoliberalism: competition as a way of life",p:["Julie Wilson describes <em>neoliberalism</em> as the extension of market competition, privatization and individual responsibility into more and more areas of life, while collective support weakens. It is not only an economic system but a way people learn to see themselves. Students are told to build a personal brand and treat every activity as résumé capital.","Wilson calls this a new hegemony: the competitive common sense that feels natural."]},
+   {h:"Self-enclosed individualism",p:["The neoliberal ideal person is a bounded, self-managing individual who is personally responsible for outcomes and only loosely obligated to others. <em>Self-enclosed individualism</em> individualizes structural problems. A wellness app that frames burnout only as a failure of personal habits hides workload, wages and housing costs.","Contrast: Carey’s ritual communication and Williams’s shared culture emphasize common life, which is exactly what this ideology weakens."]}
+  ],
+  remember:"Althusser = ideology hails us into identities. Wilson = today’s version, where competition and personal responsibility are common sense.",
+  exam:"For a power-chain essay use all four thinkers in order: Marx names it, Gramsci explains consent and resistance, Althusser shows it forms subjects, Wilson shows it now.",
+  bridge:"Next: Stuart Hall shows how this plays out in media, between makers and audiences.",
+  quiz:[
+   {q:"Interpellation is best described as…",o:["Ideology hailing individuals and recruiting them into identities","A government using force","An audience rejecting a text","A market competing"],e:"“Hey, you there!”: you recognize yourself as the person addressed."},
+   {q:"Compared with Gramsci, Althusser…",o:["Stresses how ideology constitutes subjects, leaving less room for resistance","Rejects the idea of ideology","Says ordinary people always resist","Is only about the economy"],e:"Gramsci emphasizes struggle and flux; Althusser emphasizes how ideology forms who we are."},
+   {q:"Which best defines neoliberalism for Wilson?",o:["Market competition and individual responsibility extended into more areas of life","A return to collective provision","The rule of a single party","A kind of art"],e:"It pushes competition into education, relationships, bodies and online identities."},
+   {q:"A wellness app frames burnout solely as a failure of personal habits. This reflects…",o:["Self-enclosed individualism","Counter-hegemony","Ritual communication","An oppositional reading"],e:"Structural problems like workload and wages are turned into personal failure."},
+   {q:"What link does Wilson draw between neoliberalism and hegemony?",o:["Neoliberalism is a new hegemony where competition feels like common sense","They are opposites","Neoliberalism has no ideology","Hegemony only exists in the past"],e:"Competition as a “way of life” is the dominant common sense."}
+  ],
+  compare:[0], flips:[]
+},
+{ n:5, title:"Hall: encoding and decoding", min:25, short:"Denotation and connotation, encoding, decoding, polysemy and the three readings.",
+  goal:"By the end you can explain how <b>producers encode</b> and <b>audiences decode</b>, and sort any reaction into the three readings.",
+  learn:[
+   {h:"Reading note",p:["Your review sheet excludes Hall’s week 7 reading, but encoding, decoding, polysemy, connotation, denotation and the three readings are all on the term list. Learn them from this lesson, the glossary and lecture."]},
+   {h:"Denotation and connotation",p:["Stuart Hall starts with signs. <em>Denotation</em> is the apparently literal meaning: a rose is a flower. <em>Connotation</em> is the cultural and ideological associations added on: a rose in a Valentine’s ad means romance and heterosexual courtship. A white lab coat denotes clothing but connotes expertise and authority.","Connotation is where ideology lives, because associations come from history and power. Hall also reminds us that even “literal” meaning is organized by codes."]},
+   {h:"Encoding: making the message",p:["<em>Encoding</em> is how producers turn events into media texts. Hall: the event must become a “story” before it can become a communicative event. Selection, framing, genre, language, institutional interests and assumptions about audiences all shape a <em>preferred meaning</em>. A news outlet can encode a protest as civic participation or as public disorder through camera angles, interviews, captions and vocabulary."]},
+   {h:"Decoding and polysemy",p:["<em>Decoding</em> is how audiences interpret using their own knowledge, identities and circumstances. There is “no necessary correspondence” between encoding and decoding. <em>Polysemy</em> is the capacity of a text to carry multiple meanings. <i>Barbie</i> can be read as feminist critique, corporate marketing, nostalgia, or a mix.","But polysemy is not “anything goes.” Codes and context constrain readings, and decoding happens within unequal systems of language and power."]},
+   {h:"The three readings",p:["<em>Dominant:</em> accepts the preferred meaning and the ideology behind it. <em>Negotiated:</em> accepts the general frame but modifies it with local experience (“I like the health message, I reject the body ideal”). <em>Oppositional:</em> understands the preferred meaning but rejects its framework and reads it through an alternative code (“this heroic trailer is propaganda hiding war’s costs”).","Dominant readings reproduce hegemony. Oppositional readings show counter-hegemony is possible, though they need access to alternative languages, experiences or communities."]}
+  ],
+  remember:"Hall turns the power chain toward media. Producers encode a preferred meaning, audiences decode it. Audiences are active but not free.",
+  exam:"Pick a single example (a recruitment ad, a news clip) and run all three readings on it. That shows complete command of the model.",
+  bridge:"Next: power also works through us-versus-them divides, in nations and in colonial representation.",
+  quiz:[
+   {q:"A rose denotes a flower, but in a Valentine’s ad it connotes romance. This shows…",o:["Denotation versus connotation","Dominant versus oppositional","Base versus superstructure","Transmission versus ritual"],e:"Denotation is the literal meaning; connotation is the associations added."},
+   {q:"What does encoding mean for Hall?",o:["Producers organize events into a media text with a preferred meaning","Audiences interpret a text","A text has only one meaning","Information moves from sender to receiver"],e:"Routines, genre, framing and institutions shape the preferred meaning."},
+   {q:"A viewer likes a fitness campaign’s health message but rejects its narrow body ideal. This is a…",o:["Negotiated reading","Dominant reading","Oppositional reading","Denotative reading"],e:"She accepts the frame in general and modifies it based on her own experience."},
+   {q:"A viewer sees a heroic military trailer as propaganda hiding war’s costs. This is a…",o:["Oppositional reading","Dominant reading","Negotiated reading","Preferred reading"],e:"They understand the preferred meaning but reject its ideological framework."},
+   {q:"Polysemy does NOT mean…",o:["Every reading is equally plausible","A text can carry several meanings","Readings vary by context","There is no necessary correspondence between encoding and decoding"],e:"Codes and context constrain meaning, so some readings are more plausible than others."},
+   {q:"How does Hall’s view of audiences differ from Adorno and Horkheimer’s?",o:["Hall grants audiences active interpretive agency","Hall says audiences are manipulated","They agree completely","Hall ignores audiences"],e:"Adorno and Horkheimer stress conformity and sameness; Hall stresses decoding."}
+  ],
+  compare:[2], flips:[1]
+},
+{ n:6, title:"Nation, Other and borders", min:20, short:"Imagined community, Orientalism, the Other, and Anzaldúa’s borderlands.",
+  goal:"By the end you can explain how <b>belonging</b> and <b>exclusion</b> are built together.",
+  learn:[
+   {h:"Imagined community",p:["Benedict Anderson: a nation is an <em>imagined community</em>. You will never meet most of your fellow citizens, yet you imagine a shared bond. It is imagined as “inherently limited and sovereign.” Media, language, maps and rituals make that large-scale belonging feel intimate. Daily newspapers let dispersed readers imagine moving through the same national time and events."]},
+   {h:"Orientalism",p:["Edward Said: <em>Orientalism</em> is the Western discourse that produces “the Orient” as exotic, backward, irrational, sensual or dangerous, in contrast to a rational and modern West. “The Orient was almost a European invention.” These stereotypes are tied to colonial power. They do not just misdescribe, they help authorize domination and intervention. <i>Aladdin</i>’s composite “Arabian” setting packages diverse cultures as timeless and magical for Western consumption."]},
+   {h:"The Other",p:["<em>The Other</em> is a group defined as different from and inferior to a dominant self. Said: the Orient helped define Europe “as its contrasting image.” Othering stabilizes the dominant group’s identity by contrast. News images depicting migrants only as an anonymous “flood” make them a threatening mass and affirm the citizen as normal."]},
+   {h:"Anzaldúa: living in the borderland",p:["Gloria Anzaldúa speaks from the border itself. People at borders of nation, race, language, gender and sexuality inhabit identities the binary cannot contain. Her work complicates the simple oppressor/oppressed split with hybridity and internal conflict."]},
+   {h:"Putting the three together",p:["Anderson explains how the <em>we</em> gets built. Said explains the <em>they</em> that the we is defined against. Anzaldúa shows people who fall between and break the binary. And Said uses Gramsci’s idea of hegemony: Orientalism works because Western culture treats its picture of the East as common sense."]}
+  ],
+  remember:"Imagined community plus Othering is how belonging and exclusion work together. Anzaldúa complicates the clean binary.",
+  exam:"For a “who belongs” prompt use Anderson for the inside, Said for the outside, and Anzaldúa for people at the edge. Link to hegemony and oppressor/oppressed.",
+  bridge:"Next: hierarchies of culture itself, high and low, and who decides what is good taste.",
+  quiz:[
+   {q:"What makes a nation an “imagined community” for Anderson?",o:["Members never meet most others yet imagine a shared bond","It is fake","It has no borders","It only exists on maps"],e:"Media, language, rituals and shared stories make large-scale belonging feel intimate."},
+   {q:"What is Orientalism?",o:["Western discourse that produces the Orient as exotic and inferior, defining the West by contrast","A style of art from Asia","A trade policy","A mass-production method"],e:"It ties representation to colonial knowledge and power."},
+   {q:"How do Anderson and Said fit together?",o:["Anderson shows how the “we” is imagined; Said shows how an Other is constructed against it","They are opposed","Both are about aura","Both are about taste"],e:"Imagined belonging and Othering work together."},
+   {q:"What does Anzaldúa add to the oppressor/oppressed model?",o:["Border identities that are hybrid and cannot fit the binary","A rejection of power","A theory of aura","A theory of encoding"],e:"Race, language, gender, sexuality and nation intersect at the borderland."},
+   {q:"News images showing migrants only as an anonymous “flood” are an example of…",o:["Othering","Cultural capital","A negotiated reading","Cult value"],e:"The group becomes a threatening mass, affirming the citizen as the normal subject."}
+  ],
+  compare:[4], flips:[5]
+},
+{ n:7, title:"Hierarchies of culture and taste", min:20, short:"Popular, high, low, masses, taste and cultural capital.",
+  goal:"By the end you can explain how <b>cultural value is made</b> and how <b>taste</b> reproduces social class.",
+  learn:[
+   {h:"Popular, high and low",p:["<em>Popular culture</em> means widely circulated practices and texts: entertainment, style, sport. It can mean culture liked by many, made for many, or made by people themselves. TikTok dance trends are commercialized by platforms but remade by users. It is a major site where power, pleasure and resistance meet.","<em>High culture / highbrow</em> means forms institutionally labeled refined or serious: opera, museums. <em>Low culture / lowbrow</em> means forms called vulgar or simple, often because of who the audience is, not just what the art is. Reality TV is dismissed as lowbrow even when viewers use it to debate gender, work, class and authenticity. The label can turn class prejudice into aesthetic judgment."]},
+   {h:"There are no masses",p:["Williams: “There are in fact no masses; there are only ways of seeing people as masses.” <em>Masses</em> is an abstract label that imagines large populations as undifferentiated and passive. <em>Mass culture</em> is standardized goods made at industrial scale. The tension: you can criticize concentrated media industries without stereotyping audiences as manipulable. A superhero franchise is mass-produced, yet viewers still interpret and repurpose it differently."]},
+   {h:"Bourdieu: taste and cultural capital",p:["Pierre Bourdieu says taste feels personal but is learned. “Taste classifies, and it classifies the classifier.” <em>Taste</em> reflects class position and cultural training. <em>Cultural capital</em> is the knowledge, tastes, speech, and credentials that bring social advantage. Knowing how to discuss contemporary art may help a student in an internship interview, but that knowledge depends on prior access.","This makes privilege look natural: unequal access to “legitimate” culture is turned into a judgment of merit, education and refinement."]},
+   {h:"Williams versus Bourdieu",p:["Williams challenges the hierarchy: culture is ordinary and the high/low divide is a false picture. Bourdieu explains how the hierarchy actually works and why it persists. Together: the labels are not natural, and they are tied to class power. Bourdieu’s taste hierarchy is hegemony at work, because the elite’s preferences pass for universal good taste."]}
+  ],
+  remember:"Cultural value is socially organized. High/low labels often hide class. Taste feels personal but is learned and unequal.",
+  exam:"If a prompt mentions “good taste,” “refined,” or “trashy,” answer with Bourdieu’s cultural capital and Williams’s ordinary culture, plus a concrete example like opera versus reality TV.",
+  bridge:"Next: how technology and industry change art itself.",
+  quiz:[
+   {q:"What does Williams mean by “There are no masses”?",o:["“Masses” is a way of seeing people, not a real undifferentiated crowd","Nobody watches mass media","Audiences are tiny","Culture is dead"],e:"The label imagines audiences as passive and uniform."},
+   {q:"The lowbrow label is often applied…",o:["Because of the audience as much as the form","Only to bad art","Only to old art","Only to foreign art"],e:"It can turn class prejudice into aesthetic judgment."},
+   {q:"“Taste classifies, and it classifies the classifier” means…",o:["Your taste reveals and reproduces your social position","Taste is random","Taste is natural","Taste only matters in museums"],e:"Taste feels personal but reflects class and cultural training."},
+   {q:"Discussing contemporary art fluently in an internship interview is an example of…",o:["Cultural capital","Cult value","A dominant reading","False consciousness"],e:"Valued knowledge and style that provide social advantage, dependent on prior access."},
+   {q:"How do Williams and Bourdieu differ on cultural hierarchy?",o:["Williams challenges the divide; Bourdieu explains how it works and persists","They agree on everything","Williams defends it; Bourdieu denies it","Neither discusses class"],e:"Williams says culture is ordinary; Bourdieu shows how taste reproduces class."}
+  ],
+  compare:[5], flips:[7]
+},
+{ n:8, title:"Art, reproduction and industry", min:20, short:"Authenticity, aura, cult and exhibition value, and the culture industries.",
+  goal:"By the end you can explain how <b>technology and capitalism</b> change art, and the two opposed responses to it.",
+  learn:[
+   {h:"Authenticity and aura",p:["Walter Benjamin: <em>authenticity</em> is the quality of being a genuine original with a specific history. Technical reproduction transforms it. Institutions and audiences authorize authenticity, it is not only inside the object. A museum-verified painting is authentic while an identical poster is not.","<em>Aura</em> is the unique presence and authority of an artwork, grounded in its singular existence, distance and tradition. Seeing the Mona Lisa in the Louvre carries an aura that viewing it on a phone does not. When images become endlessly reproducible, access expands but that unique presence weakens."]},
+   {h:"Cult value and exhibition value",p:["<em>Cult value</em> comes from ritual use, secrecy and embeddedness in tradition, like a sacred icon in a shrine. <em>Exhibition value</em> comes from visibility and circulation, like the same image reproduced on posters and social media. Benjamin: photography and film shift art’s function from ritual toward mass display and politics. He is cautiously hopeful about that."]},
+   {h:"The culture industries",p:["Theodor Adorno and Max Horkheimer are more pessimistic. The <em>culture industries</em> industrialize culture through standardization, repetition and marketing, offering managed difference. “Culture today is infecting everything with sameness.” Streaming services recommend formulaic variations of successful genres, so personalization feels unique while keeping you inside standard options."]},
+   {h:"The great disagreement",p:["Benjamin and Adorno/Horkheimer both belong to the Frankfurt School and both think technology changes art. Benjamin sees emancipatory potential in mass access. Adorno and Horkheimer see conformity and control. Williams and Hall then push back on the whole picture: there are no passive masses, and audiences actively decode. That four-way debate is the most likely essay."]}
+  ],
+  remember:"Reproduction trades aura for access. Benjamin is hopeful, Adorno and Horkheimer pessimistic, Hall and Williams stress active audiences.",
+  exam:"For prompts about technology, art or audiences, set up the debate (Benjamin vs Adorno/Horkheimer) then bring in Hall or Williams as the third voice, using streaming or the Mona Lisa.",
+  bridge:"You have now met every term. The exam lab lets you connect and test them all.",
+  quiz:[
+   {q:"What is aura for Benjamin?",o:["The unique presence of an original, tied to its history and distance","A brand color","A kind of reproduction","The price of an artwork"],e:"Aura is weakened when images are endlessly reproducible."},
+   {q:"The shift from cult value to exhibition value is a shift…",o:["From ritual and tradition to circulation and display","From display to ritual","From rich to poor","From image to text"],e:"Photography and film favor visibility and mass access."},
+   {q:"How do Benjamin and Adorno/Horkheimer differ?",o:["Benjamin sees emancipatory potential in mass reproduction; they see standardization and conformity","They agree completely","Benjamin hates technology","Adorno loves mass culture"],e:"Both are Frankfurt School but Benjamin is cautiously hopeful and they are pessimistic."},
+   {q:"Streaming services recommending formulaic variations of hits illustrate…",o:["Culture industries","Aura","Counter-hegemony","Imagined community"],e:"Standardization with a feeling of personalization."},
+   {q:"Authenticity depends on…",o:["Institutions, history and audiences authorizing the original","Only the physical object","Only price","Only the artist’s mood"],e:"A museum-verified painting is authentic; an identical poster is not."}
+  ],
+  compare:[3], flips:[6,3]
+}
+];
+
+/* ============ STATE ============ */
+const $ = (s,r=document)=>r.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!==undefined)e.innerHTML=h; return e};
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let known=store.get("pol-known",{});
+let done=store.get("pol-done",{});   // lesson -> best score
+const termsOf=n=>T.filter(t=>t.L===n);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+function updateProg(){
+  const n=Object.keys(done).length;
+  $("#navprog").textContent=`${n} / ${LESSONS.length} lessons`;
+}
+
+/* ============ COMPONENTS ============ */
+function termCard(t){
+  const c=el("div","card"+(known[t.id]?" known":""));
+  c.dataset.id=t.id;
+  c.innerHTML=`<div class="masker">
+    <div class="top">
+      <div class="eyebrow">${t.a}</div><h3>${t.n}</h3>
+      <p class="def">${t.d}</p>
+      <p class="why"><b>Why it matters:</b> ${t.w}</p>
+      <p class="quote">“${t.q}”<small>${t.qa}</small></p>
+      <div class="acts"><button class="tlink" data-a="why">Why it matters</button><button class="tlink" data-a="quote">Quote</button><button class="btn sec sm" data-a="known">${known[t.id]?"Learned ✓":"Mark learned"}</button></div>
+    </div>
+    <div class="ex"><b>Example</b>${t.e}</div></div>`;
+  c.addEventListener("click",ev=>{
+    if(document.body.classList.contains("recall")&&!c.classList.contains("revealed")){c.classList.add("revealed");return}
+    const a=ev.target.dataset.a;
+    if(a==="why")c.classList.toggle("show-why");
+    if(a==="quote")c.classList.toggle("show-quote");
+    if(a==="known"){known[t.id]=!known[t.id];c.classList.toggle("known",!!known[t.id]);ev.target.textContent=known[t.id]?"Learned ✓":"Mark learned";store.set("pol-known",known)}
+  });
+  return c;
+}
+
+function quizBlock(questions,onDone){
+  const box=el("div");
+  const score=el("div","scorebar","");
+  let right=0,count=0;
+  const total=questions.length;
+  questions.forEach((q,qi)=>{
+    const wrap=el("div","q",`<p class="qt">${qi+1}. ${q.q}</p><div class="opts"></div><div class="expl"></div>`);
+    const opts=shuffle(q.o.map((t,i)=>({t,ok:i===0})));
+    const ob=wrap.querySelector(".opts");
+    opts.forEach(o=>{
+      const b=el("button","opt",o.t);
+      b.onclick=()=>{
+        if(wrap.classList.contains("answered"))return;
+        wrap.classList.add("answered");count++;
+        if(o.ok){right++;b.classList.add("right")}
+        else{b.classList.add("wrong");[...ob.children].forEach((x,i)=>{if(opts[i].ok)x.classList.add("right")})}
+        wrap.querySelector(".expl").innerHTML=(o.ok?"<b>Correct.</b> ":"<b>Not quite.</b> ")+q.e;
+        score.innerHTML=`Score: <b>${right} / ${count}</b> of ${total}`;
+        if(count===total&&onDone)onDone(right,total,score);
+      };
+      ob.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+  box.appendChild(score);
+  return box;
+}
+
+function compareBlock(idxs){
+  const wrap=el("div");
+  const tabs=el("div","tabs");const card=el("div","tablecard","<table></table>");const say=el("div","say");
+  const show=k=>{
+    const c=COMPARE[idxs[k]];
+    tabs.querySelectorAll("button").forEach((b,j)=>b.setAttribute("aria-selected",j===k));
+    card.querySelector("table").innerHTML=`<thead><tr>${c.cols.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${c.rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    say.innerHTML=`<b>Say it in an essay</b>${c.s}`;
+  };
+  idxs.forEach((ix,k)=>{const b=el("button","",COMPARE[ix].t);b.onclick=()=>show(k);tabs.appendChild(b)});
+  if(idxs.length>1)wrap.appendChild(tabs);
+  wrap.append(card,say);show(0);return wrap;
+}
+function flipBlock(idxs){
+  const g=el("div","flips");
+  idxs.forEach(i=>{const f=FLIPS[i];const b=el("button","flip",`<div class="eyebrow">Connection · say it first</div><h3>${f[0]}</h3><p>${f[1]}</p><div class="hint">Tap to check yourself</div>`);b.onclick=()=>b.classList.toggle("open");g.appendChild(b)});
+  return g;
+}
+
+/* ============ VIEWS ============ */
+const app=$("#app");
+function home(){
+  app.innerHTML="";
+  const firstOpen=LESSONS.find(l=>done[l.n]===undefined);
+  const hero=el("div","hero",`<h1>Practices<br>of Looking.</h1>
+    <div class="intro"><p><b>Eight lessons. One story.</b> Work in order, check yourself after each, then connect it all in the exam lab.</p>
+    <div class="links"><a class="link" href="#/lesson/${firstOpen?firstOpen.n:1}">${firstOpen&&Object.keys(done).length?"Continue where you left off":"Start lesson 1"}</a><a class="link" href="#/exam">Exam lab</a><a class="link" href="#/glossary">Glossary</a></div></div>`);
+  app.appendChild(hero);
+  const total=LESSONS.reduce((s,l)=>s+l.min,0);
+  const s=el("section","blk");s.style.paddingTop="24px";
+  s.innerHTML=`<h2>The course map. <span>${LESSONS.length} lessons · about ${Math.round((total+30)/60*10)/10} hours with the exam lab.</span></h2><p class="sub">Each lesson has four steps: Learn, Key terms, Check, Connect. A lesson counts as complete when you finish its Check.</p>`;
+  const map=el("div","map");
+  LESSONS.forEach(l=>{
+    const isDone=done[l.n]!==undefined,isNext=firstOpen&&firstOpen.n===l.n;
+    const c=el("a","lcard"+(isDone?" done":"")+(isNext?" next":""),`<div class="top"><div class="eyebrow">Lesson ${l.n} · ${l.min} min</div><h3>${l.title}</h3><p>${l.short}</p></div><div class="foot"><span>${isDone?"Completed · "+done[l.n]+" correct":(isNext?"Up next":termsOf(l.n).length+" terms")}</span><span>${isDone?"Review ›":"Start ›"}</span></div>`);
+    c.href="#/lesson/"+l.n;map.appendChild(c);
+  });
+  const ex=el("a","lcard",`<div class="top"><div class="eyebrow">Final · 30 min</div><h3>Exam lab</h3><p>Compare every thinker, drill IDs, take a mixed review, and outline likely essays.</p></div><div class="foot"><span>Unlocks best after lesson 8</span><span>Open ›</span></div>`);ex.href="#/exam";map.appendChild(ex);
+  s.appendChild(map);
+  const spine=el("section","blk");
+  spine.innerHTML=`<h2>The spine. <span>The one-paragraph version of the whole course.</span></h2><p class="sub">Read it now, and again at the end. If you can retell it, you can connect any two readings.</p>
+  <div class="prose"><div class="box"><div class="eyebrow">The story</div><p><b>Culture</b> is a whole way of life, made of material things and symbolic meanings (Williams). <b>Communication</b> both transmits information and ritually builds a shared world (Carey), so reality is <b>socially constructed</b>. Those who shape that construction hold power, and <b>ideology</b> (Marx) makes unequal arrangements feel natural. <b>Gramsci</b> says this works through consent (<b>hegemony</b>) and ordinary people can resist (<b>good sense, organic intellectuals, counter-hegemony</b>). <b>Althusser</b> says ideology <b>hails</b> us into identities, and <b>Wilson</b> shows neoliberalism as today’s version. <b>Hall</b> shows how media <b>encode</b> and audiences <b>decode</b> as dominant, negotiated or oppositional. Power also shows up in <b>binaries</b>: nation versus outsider (Anderson, Said, Anzaldúa) and high versus low culture (Williams, Bourdieu). <b>Technology and capitalism</b> reshape art (Benjamin, Adorno and Horkheimer).</p></div></div>`;
+  app.append(s,spine);
+}
+
+function lesson(n,step=0){
+  const L=LESSONS.find(l=>l.n===n);if(!L){location.hash="#/";return}
+  app.innerHTML="";
+  const head=el("div","lhead",`<div class="eyebrow">Lesson ${n} of ${LESSONS.length} · ${L.min} min</div><h1 class="lesson-title">${L.title}</h1><p class="lgoal">${L.goal}</p>`);
+  const steps=["Learn","Key terms","Check","Connect"];
+  const st=el("div","stepper");
+  const body=el("div");
+  const checked=done[n]!==undefined;
+  const go=i=>{
+    step=i;
+    st.querySelectorAll("button").forEach((b,j)=>b.setAttribute("aria-selected",j===i));
+    body.innerHTML="";
+    const nav=el("div","nav-row");
+    const back=el("button","btn sec",i===0?"Course map":"‹ "+steps[i-1]);
+    back.onclick=()=>i===0?location.hash="#/":go(i-1);
+    const last=i===steps.length-1;
+    const nxt=el("button","btn",last?(n<LESSONS.length?"Next lesson ›":"To exam lab ›"):steps[i+1]+" ›");
+    nxt.onclick=()=>{if(last){location.hash=n<LESSONS.length?"#/lesson/"+(n+1):"#/exam"}else go(i+1)};
+    if(i===0){
+      const pr=el("div","prose");
+      L.learn.forEach(s=>{pr.appendChild(el("h3","",s.h));s.p.forEach(p=>pr.appendChild(el("p","",p)))});
+      pr.appendChild(el("div","box",`<div class="eyebrow">Remember</div><p>${L.remember}</p>`));
+      pr.appendChild(el("div","box",`<div class="eyebrow">Exam move</div><p>${L.exam}</p>`));
+      body.appendChild(pr);
+    }
+    if(i===1){
+      body.appendChild(el("p","sub",`${termsOf(n).length} terms in this lesson. Use recall mode to hide each card until you tap it, say the definition out loud, then check.`));
+      const tb=el("div","toolbar");
+      const rb=el("button","btn sec sm","Recall mode: "+(document.body.classList.contains("recall")?"on":"off"));
+      rb.onclick=()=>{const on=document.body.classList.toggle("recall");rb.textContent="Recall mode: "+(on?"on":"off");body.querySelectorAll(".card").forEach(c=>c.classList.remove("revealed"))};
+      tb.appendChild(rb);body.appendChild(tb);
+      const g=el("div","cgrid");termsOf(n).forEach(t=>g.appendChild(termCard(t)));body.appendChild(g);
+    }
+    if(i===2){
+      body.appendChild(el("p","sub","Answer every question. You get feedback after each one. Finishing marks the lesson complete."));
+      body.appendChild(quizBlock(L.quiz,(r,t,scoreEl)=>{
+        done[n]=Math.max(done[n]??0,r);store.set("pol-done",done);updateProg();
+        scoreEl.innerHTML+=` · <b>Lesson complete.</b> ${r===t?"Perfect.":"Review the feedback above, then continue."}`;
+        st.querySelectorAll("button")[2].innerHTML="Check<span class='tick'>✓</span>";
+      }));
+    }
+    if(i===3){
+      if(L.compare.length){body.appendChild(el("h2","","Compare and contrast. <span>Learn the table, then say the one-liner out loud.</span>"));body.appendChild(el("div","",""));body.lastChild.style.height="14px";body.appendChild(compareBlock(L.compare))}
+      if(L.flips.length){const h=el("h2","","Connections. <span>Tap to flip.</span>");h.style.marginTop=L.compare.length?"56px":"0";body.appendChild(h);body.appendChild(el("div","")).style.height="14px";body.appendChild(flipBlock(L.flips))}
+      if(!L.compare.length&&!L.flips.length)body.appendChild(el("p","sub","Review the Remember and Exam move boxes in Learn."));
+      body.appendChild(el("div","prose")).innerHTML=`<div class="box"><div class="eyebrow">Bridge</div><p>${L.bridge}</p></div>`;
+    }
+    nav.append(back,nxt);body.appendChild(nav);
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+  steps.forEach((s,i)=>{const b=el("button","",s+(i===2&&checked?"<span class='tick'>✓</span>":""));b.onclick=()=>go(i);st.appendChild(b)});
+  const sec=el("section","blk");sec.style.paddingTop="0";sec.append(st,body);
+  app.append(head,sec);
+  go(step);
+  window.scrollTo(0,0);
+}
+
+function exam(){
+  app.innerHTML="";
+  app.appendChild(el("div","lhead",`<div class="eyebrow">Final · about 30 min</div><h1 class="lesson-title">Exam lab.</h1><p class="lgoal"><b>Connect the dots</b> across every reading, then practice in the exam’s own format.</p>`));
+  const S=(title,sub)=>{const s=el("section","blk");s.innerHTML=`<h2>${title}</h2><p class="sub">${sub}</p>`;app.appendChild(s);return s};
+
+  let s=S("1 · Compare everything. <span>The essays are won here.</span>","Seven comparisons. Learn each table, then say its essay one-liner out loud.");
+  s.appendChild(compareBlock(COMPARE.map((_,i)=>i)));
+  s=S("2 · Connections. <span>Tap to flip.</span>","Eight links the exam rewards.");
+  s.appendChild(flipBlock(FLIPS.map((_,i)=>i)));
+
+  s=S("3 · Mixed review. <span>10 random questions from every lesson.</span>","Questions come from all eight lessons. Take it more than once.");
+  const holder=el("div");s.appendChild(holder);
+  const runMix=()=>{
+    holder.innerHTML="";
+    const all=LESSONS.flatMap(l=>l.quiz);
+    holder.appendChild(quizBlock(shuffle(all).slice(0,10)));
+    const b=el("button","btn sec sm","New set");b.onclick=runMix;holder.appendChild(b);
+  };runMix();
+
+  s=S("4 · ID drill. <span>Define, significance, example.</span>","Draw a term, write all three parts in 5 minutes, then reveal the model.");
+  const p=el("div","two");
+  const idp=el("div","panel",`<div class="eyebrow">ID drill</div><h3 id="idterm">Press draw</h3><p class="score" id="idscore">Write all three parts, then reveal the model answer.</p>
+    <label>1 · Define</label><textarea id="a1" placeholder="One precise sentence, name the author"></textarea>
+    <label>2 · Significance</label><textarea id="a2" placeholder="Tie it to a course theme"></textarea>
+    <label>3 · Example</label><textarea id="a3" placeholder="A specific named case, and how the term works in it"></textarea>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn sm" id="iddraw">Draw a term</button><button class="btn sec sm" id="idreveal">Reveal model</button><span class="score" id="idtimer">5:00</span></div><div class="model" id="idmodel"></div>`);
+  const qp=el("div","panel",`<div class="eyebrow">Who said it?</div><p class="qtext" id="qq"></p><div class="opts" id="qopts" style="margin-top:16px"></div><p class="score" id="qscore" style="margin-top:14px"></p><button class="btn sec sm" id="qnext" style="margin-top:6px">Next quote</button>`);
+  p.append(idp,qp);s.appendChild(p);
+  let idTimer=null,cur=null;
+  $("#iddraw").onclick=()=>{
+    const pool=T.filter(t=>!known[t.id]);const arr=pool.length?pool:T;cur=arr[Math.floor(Math.random()*arr.length)];
+    $("#idterm").textContent=cur.n;$("#idscore").textContent=cur.a+" · write all three parts, then reveal the model.";
+    ["a1","a2","a3"].forEach(i=>$("#"+i).value="");$("#idmodel").classList.remove("on");
+    clearInterval(idTimer);let left=300;$("#idtimer").textContent="5:00";
+    idTimer=setInterval(()=>{left=Math.max(0,left-1);$("#idtimer").textContent=`${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`;if(!left)clearInterval(idTimer)},1000);
+  };
+  $("#idreveal").onclick=()=>{if(!cur)return;clearInterval(idTimer);$("#idmodel").innerHTML=`<b>1 · Define:</b> ${cur.d}<br><br><b>2 · Significance:</b> ${cur.w}<br><br><b>3 · Example:</b> ${cur.e}`;$("#idmodel").classList.add("on")};
+  const authors=["Williams","Carey","Marx and Engels","Engels","Marx","Gramsci","Althusser","Hall","Wilson","Anderson","Said","Benjamin","Adorno and Horkheimer","Bourdieu"];
+  let qs={r:0,t:0},qc=null;
+  const nextQ=()=>{
+    const pool=T.filter(t=>authors.includes(t.qa));qc=pool[Math.floor(Math.random()*pool.length)];
+    $("#qq").textContent=`“${qc.q}”`;
+    const opts=shuffle([qc.qa,...shuffle(authors.filter(a=>a!==qc.qa)).slice(0,3)]);
+    const box=$("#qopts");box.innerHTML="";box.dataset.done="0";
+    opts.forEach(o=>{const b=el("button","opt",o);b.onclick=()=>{
+      if(box.dataset.done==="1")return;box.dataset.done="1";qs.t++;
+      if(o===qc.qa){qs.r++;b.classList.add("right")}else{b.classList.add("wrong");[...box.children].find(x=>x.textContent===qc.qa).classList.add("right")}
+      $("#qscore").innerHTML=`${qs.r} / ${qs.t} correct · belongs to <b>${qc.n}</b>.`};box.appendChild(b)});
+  };
+  $("#qnext").onclick=nextQ;nextQ();
+
+  s=S("5 · Essay lab. <span>Four likely prompts, outlined.</span>","Try outlining each one yourself in 5 minutes, then open the model outline.");
+  const eg=el("div","essays");
+  [
+   {q:"The ideas of the ruling class are in every epoch the ruling ideas.",s:"Marx and Engels, The German Ideology",o:["<b>Thesis:</b> Marx names the problem (ideology serves power); Gramsci explains the mechanism (consent) and the exit (counter-hegemony).","<b>Reading A:</b> Marx and Engels: base conditions superstructure; false consciousness hides exploitation.","<b>Reading B:</b> Gramsci: hegemony is consent, common sense contains good sense, so people are not simply duped.","<b>Example:</b> homeownership as the normal adult goal, or neoliberal personal branding (Wilson).","<b>Close:</b> ideology is contested, which is the resistance theme."]},
+   {q:"There are in fact no masses; there are only ways of seeing people as masses.",s:"Williams, Culture and Culture Is Ordinary",o:["<b>Thesis:</b> Williams rejects the passive-masses picture, which clashes with Adorno and Horkheimer and aligns with Hall.","<b>Reading A:</b> Adorno/Horkheimer: culture industry produces sameness; streaming recommendation loops.","<b>Reading B:</b> Hall: audiences decode as dominant, negotiated or oppositional.","<b>Example:</b> a superhero franchise decoded differently by different audiences.","<b>Close:</b> audiences are active but within unequal systems of language and power."]},
+   {q:"Taste classifies, and it classifies the classifier.",s:"Bourdieu, Distinction",o:["<b>Thesis:</b> Taste feels personal but sorts people by class, so the high/low divide is a form of power.","<b>Reading A:</b> Bourdieu: cultural capital, taste as learned class training.","<b>Reading B:</b> Williams: culture is ordinary, the “bad commercial culture” label is prejudice.","<b>Example:</b> opera vs. reality TV, or discussing contemporary art in an internship interview.","<b>Close:</b> hierarchy of culture as hegemony, which is the binaries and hierarchies theme."]},
+   {q:"The Orient was almost a European invention.",s:"Said, Orientalism",o:["<b>Thesis:</b> Said shows the West builds the Other to define itself; Anderson shows how the “we” gets built; Anzaldúa shows who falls between.","<b>Reading A:</b> Said: Orientalism as knowledge tied to power; Aladdin’s composite “Arabian” setting.","<b>Reading B:</b> Anderson: imagined community, media creating a bounded national “we”.","<b>Complicate:</b> Anzaldúa’s borderland identities that the binary cannot hold.","<b>Close:</b> representation authorizes domination, linking to hegemony and oppressor/oppressed."]}
+  ].forEach(e=>{
+    const d=el("div","essay",`<div class="eyebrow">Prompt</div><q>${e.q}</q><p class="src">${e.s}</p><div><button class="btn sec sm">Show model outline</button></div><ol>${e.o.map(x=>`<li>${x}</li>`).join("")}</ol>`);
+    d.querySelector("button").onclick=ev=>{d.classList.toggle("open");ev.target.textContent=d.classList.contains("open")?"Hide outline":"Show model outline"};eg.appendChild(d);
+  });
+  s.appendChild(eg);
+  s.appendChild(el("div","template",`<div class="eyebrow">Essay formula · 20 to 25 minutes</div><ol><li><b>Thesis (2 sentences):</b> how the quote works with your chosen reading and what it reveals.</li><li><b>Unpack the quote:</b> name the term it is really about.</li><li><b>Reading A:</b> one concrete detail from the text, plus an example.</li><li><b>Complicate with reading B:</b> name the specific disagreement or overlap.</li><li><b>Close:</b> tie back to a course theme.</li></ol><p class="score" style="margin:14px 0 0">Cite author and article title every time. Use at least two authors.</p>`));
+  s.appendChild(el("div","template",`<div class="eyebrow">ID formula · about 5 minutes each</div><ol><li><b>Define:</b> one precise sentence with the author.</li><li><b>Significance:</b> one or two sentences tying it to a theme and saying what it helps us see.</li><li><b>Example:</b> one named case, plus one sentence on how the term works in it.</li></ol>`));
+  const nav=el("div","nav-row");const b=el("a","btn sec","‹ Course map");b.href="#/";nav.appendChild(b);s.appendChild(nav);
+}
+
+function glossary(){
+  app.innerHTML="";
+  app.appendChild(el("div","lhead",`<div class="eyebrow">Reference</div><h1 class="lesson-title">Glossary.</h1><p class="lgoal">All ${T.length} terms. <b>Search</b> by term, author or idea.</p>`));
+  const s=el("section","blk");s.style.paddingTop="28px";
+  const tb=el("div","toolbar");
+  const inp=el("input");inp.type="search";inp.placeholder="Search terms or authors";inp.setAttribute("aria-label","Search terms");
+  const rb=el("button","btn sec sm","Recall mode: "+(document.body.classList.contains("recall")?"on":"off"));
+  rb.onclick=()=>{const on=document.body.classList.toggle("recall");rb.textContent="Recall mode: "+(on?"on":"off");s.querySelectorAll(".card").forEach(c=>c.classList.remove("revealed"))};
+  tb.append(inp,rb);s.appendChild(tb);
+  const g=el("div","cgrid");T.forEach(t=>g.appendChild(termCard(t)));s.appendChild(g);
+  inp.oninput=()=>{const q=inp.value.trim().toLowerCase();T.forEach((t,i)=>{g.children[i].classList.toggle("hidden",!!q&&!(t.n+" "+t.a+" "+t.d).toLowerCase().includes(q))})};
+  app.appendChild(s);
+}
+
+/* ============ ROUTER ============ */
+function route(){
+  const h=location.hash.replace(/^#\/?/,"");
+  document.body.classList.remove("recall");
+  if(h.startsWith("lesson/"))lesson(parseInt(h.split("/")[1],10));
+  else if(h==="exam")exam();
+  else if(h==="glossary")glossary();
+  else home();
+  updateProg();
+  $("#navlinks").classList.remove("open");
+}
+window.addEventListener("hashchange",route);
+$("#menubtn").onclick=()=>$("#navlinks").classList.toggle("open");
+route();
+</script>
+</body>
+</html>
